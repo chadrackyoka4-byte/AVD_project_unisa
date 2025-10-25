@@ -1,0 +1,43 @@
+apple-of-fortune-bot/
+│
+├── main.py                # Point d’entrée (logique du bot)
+├── data/
+│   ├── history.csv         # Historique du jeu (résultats précédents)
+│
+├── models/
+│   ├── predictor.py        # Algorithme de prédiction probabiliste
+│
+├── web/
+│   ├── app.py              # API Flask ou interface web
+│   ├── templates/
+│   └── static/
+│
+├── requirements.txt        # Librairies Python
+└── README.md               # Documentation GitHub
+
+import random
+import pandas as pd
+
+# Simulation simple du jeu Apple of Fortune
+def predict_next_choice(history):
+    """
+    Analyse l'historique et propose une colonne avec la meilleure probabilité.
+    """
+    if len(history) == 0:
+        return random.randint(1, 5)
+
+    # Calcul de la fréquence de succès par colonne
+    df = pd.DataFrame(history, columns=['col', 'success'])
+    rates = df.groupby('col')['success'].mean()
+
+    # Choisir la colonne la plus sûre
+    best_col = rates.idxmax()
+    confidence = rates.max() * 100
+    return int(best_col), round(confidence, 2)
+
+# Exemple d'utilisation
+history = [
+    (1, 1), (2, 0), (3, 1), (1, 1), (4, 0), (3, 1)
+]
+col, conf = predict_next_choice(history)
+print(f"🧠 Recommandation : colonne {col} (confiance {conf}%)")
